@@ -1,26 +1,38 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import 'antd/dist/antd.css';
+import router from '@router';
+import Login from './pages/login';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+export default class extends React.Component {
+  recurseRouter(router, props, index) {
+    if (!router.subRoutes || router.subRoutes.length === 0) {
+      return <router.component key={index} {...props} />
+    } else {
+      return router.subRoutes.map((route, routeIndex) => (
+        <Switch key={routeIndex}>
+          <Route
+            // exact
+            path={route.path}
+            render={props => this.recurseRouter(route, props, routeIndex)}
+          />
+        </Switch>
+      ))
+    }
+  }
 
-export default App;
+  render() {
+    return (
+      <Router>
+        { router.map((route, index) =>
+          <Switch key={index}>
+            <Route
+              path={route.path}
+              render={props => <route.component {...props} />}
+            />
+        </Switch>
+        )}
+      </Router>
+    )
+  }
+};
